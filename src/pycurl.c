@@ -1,5 +1,3 @@
-/* $Id: pycurl.c,v 1.150 2010/10/13 15:53:40 zanee Exp $ */
-
 /* PycURL -- cURL Python module
  *
  * Authors:
@@ -30,7 +28,7 @@
  *  Nick Pilon <npilon at oreilly.com>
  *  Thomas Hunger <teh at camvine.org>
  *
- * See file README for license information.
+ * See README.rst for license information.
  */
 
 #if (defined(_WIN32) || defined(__WIN32__)) && !defined(WIN32)

@@ -168,7 +168,7 @@ def get_data_files():
     else:
         datadir = os.path.join("share", "doc", PACKAGE)
     #
-    files = ["ChangeLog", "COPYING", "COPYING2", "INSTALL", "README", "TODO",]
+    files = ["ChangeLog", "COPYING", "COPYING2", "INSTALL", "README.rst", "TODO",]
     if files:
         data_files.append((os.path.join(datadir), files))
     files = glob.glob(os.path.join("doc", "*.html"))
@@ -197,9 +197,9 @@ setup_args = dict(
     description="PycURL -- cURL library module for Python",
     author="Kjetil Jacobsen, Markus F.X.J. Oberhumer",
     author_email="kjetilja at gmail.com, markus at oberhumer.com",
-    maintainer="Kjetil Jacobsen, Markus F.X.J. Oberhumer, Christopher Warner",
-    maintainer_email="kjetilja at gmail.com, markus at oberhumer.com, cwarner at kernelcode.com",
-    url="http://pycurl.sourceforge.net/",
+    maintainer="Oskari Saarenmaa",
+    maintainer_email="os@ohmu.fi",
+    url="https://github.com/saaros/pycurl",
     license="LGPL/MIT",
     data_files=get_data_files(),
     ext_modules=[ext],
