@@ -1141,7 +1141,7 @@ opensocket_callback(void *clientp, curlsocktype purpose,
 
     self = (CurlObject *)clientp;
     tmp_state = get_thread_state(self);
-    
+
     PyEval_AcquireThread(tmp_state);
     arglist = Py_BuildValue("(iii)", address->family, address->socktype, address->protocol);
     if (arglist == NULL)
@@ -1217,7 +1217,7 @@ seek_callback(void *stream, curl_off_t offset, int origin)
           source = origin;
           break;
     }
-    
+
     /* run callback */
     cb = self->seek_cb;
     if (cb == NULL)
@@ -2619,7 +2619,7 @@ do_multi_socket_action(CurlMultiObject *self, PyObject *args)
     curl_socket_t socket;
     int ev_bitmask;
     int running = -1;
-    
+
     if (!PyArg_ParseTuple(args, "ii:socket_action", &socket, &ev_bitmask))
         return NULL;
     if (check_multi_state(self, 1 | 2, "socket_action") != 0) {

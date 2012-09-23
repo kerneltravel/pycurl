@@ -1,20 +1,17 @@
 #! /usr/bin/env python
-# -*- coding: iso-8859-1 -*-
+# -*- coding: utf-8 -*-
 # vi:ts=4:et
-# $Id: setup.py,v 1.152 2010/04/28 16:06:35 zanee Exp $
 
 """Setup script for the PycURL module distribution."""
 
 PACKAGE = "pycurl"
 PY_PACKAGE = "curl"
-VERSION = "7.19.0"
+VERSION = "7.19.2"
 
-import glob, os, re, sys, string, subprocess
-import distutils
+import glob, os, sys, subprocess
 from distutils.core import setup
 from distutils.extension import Extension
 from distutils.util import split_quoted
-from distutils.version import LooseVersion
 
 include_dirs = []
 define_macros = []
@@ -31,13 +28,12 @@ def scan_argv(s, default):
     i = 1
     while i < len(sys.argv):
         arg = sys.argv[i]
-        if string.find(arg, s) == 0:
+        if arg.startswith(s):
             p = arg[len(s):]
             assert p, arg
             del sys.argv[i]
         else:
             i = i + 1
-    ##print sys.argv
     return p
 
 
@@ -46,8 +42,8 @@ def add_libdirs(envvar, sep, fatal=0):
     v = os.environ.get(envvar)
     if not v:
         return
-    for dir in string.split(v, sep):
-        dir = string.strip(dir)
+    for dir in v.split(sep):
+        dir = dir.strip()
         if not dir:
             continue
         dir = os.path.normpath(dir)
@@ -59,40 +55,38 @@ def add_libdirs(envvar, sep, fatal=0):
             sys.exit(1)
 
 
-if sys.platform == "win32":
-    # Windows users have to configure the CURL_DIR path parameter to match
+def config_win32():
+    global include_dirs, extra_objects, extra_link_args, extra_compile_args
+    # Windows users have to configure the curl_dir path parameter to match
     # their cURL source installation.  The path set here is just an example
     # and thus unlikely to match your installation.
-    CURL_DIR = r"c:\src\build\pycurl\curl-7.16.2.1"
-    CURL_DIR = scan_argv("--curl-dir=", CURL_DIR)
-    print "Using curl directory:", CURL_DIR
-    assert os.path.isdir(CURL_DIR), "please check CURL_DIR in setup.py"
-    include_dirs.append(os.path.join(CURL_DIR, "include"))
-    extra_objects.append(os.path.join(CURL_DIR, "lib", "libcurl.lib"))
+    curl_dir = r"c:\src\build\pycurl\curl-7.16.2.1"
+    curl_dir = scan_argv("--curl-dir=", curl_dir)
+    print "Using curl directory:", curl_dir
+    assert os.path.isdir(curl_dir), "please check curl_dir in setup.py"
+    include_dirs.append(os.path.join(curl_dir, "include"))
+    extra_objects.append(os.path.join(curl_dir, "lib", "libcurl.lib"))
     extra_link_args.extend(["gdi32.lib", "wldap32.lib", "winmm.lib", "ws2_32.lib",])
     add_libdirs("LIB", ";")
-    if string.find(sys.version, "MSC") >= 0:
+    if "MSC" in sys.version:
         extra_compile_args.append("-O2")
         extra_compile_args.append("-GF")        # enable read-only string pooling
         extra_compile_args.append("-WX")        # treat warnings as errors
         extra_link_args.append("/opt:nowin98")  # use small section alignment
-else:
-    # Find out the rest the hard way
-    OPENSSL_DIR = scan_argv("--openssl-dir=", "")
-    if OPENSSL_DIR != "":
-        include_dirs.append(os.path.join(OPENSSL_DIR, "include"))
-    CURL_CONFIG = "curl-config"
-    CURL_CONFIG = scan_argv("--curl-config=", CURL_CONFIG)
-    d = os.popen("'%s' --version" % CURL_CONFIG).read()
-    if d:
-        d = string.strip(d)
+
+def config_unix():
+    global include_dirs, library_dirs, extra_compile_args, extra_link_args, define_macros, libraries
+
+    # get relevant compile and link flags
+    curl_config = scan_argv('--curl-config=', 'curl-config')
+    d = os.popen("'%s' --version" % curl_config).read().strip()
     if not d:
-        raise Exception, ("`%s' not found -- please install the libcurl development files" % CURL_CONFIG)
-    print "Using %s (%s)" % (CURL_CONFIG, d)
-    for e in split_quoted(os.popen("'%s' --cflags" % CURL_CONFIG).read()):
-        if e[:2] == "-I":
+        raise Exception("`%s' not found -- please install the libcurl development files" % curl_config)
+    print "Using %s (%s)" % (curl_config, d)
+    for e in split_quoted(os.popen("'%s' --cflags" % curl_config).read()):
+        if e[:2] == '-I':
             # do not add /usr/include
-            if not re.search(r"^\/+usr\/+include\/*$", e[2:]):
+            if e[2:].strip('/') != 'usr/include':
                 include_dirs.append(e[2:])
         else:
             extra_compile_args.append(e)
@@ -100,48 +94,58 @@ else:
     # Run curl-config --libs and --static-libs.  Some platforms may not
     # support one or the other of these curl-config options, so gracefully
     # tolerate failure of either, but not both.
-    optbuf = ""
-    for option in ["--libs", "--static-libs"]:
-        p = subprocess.Popen("'%s' %s" % (CURL_CONFIG, option), shell=True,
-            stdout=subprocess.PIPE)
+    optbuf = ''
+    for option in ['--libs', '--static-libs']:
+        p = subprocess.Popen("'%s' %s" % (curl_config, option),
+                             shell=True, stdout=subprocess.PIPE)
         (stdout, stderr) = p.communicate()
-        if p.wait() == 0:
+        if p.returncode == 0:
             optbuf += stdout
-    if optbuf == "":
-        raise Exception, ("Neither of curl-config --libs or --static-libs" +
-            "produced output")
-    libs = split_quoted(optbuf)
-
-    for e in libs:
-        if e[:2] == "-l":
+    if not optbuf:
+        raise Exception('Neither of curl-config --libs or --static-libs'
+                        'produced output')
+    ssltype = None
+    for e in split_quoted(optbuf):
+        if e[:2] == '-l':
             libraries.append(e[2:])
-            if e[2:] == 'ssl':
-                define_macros.append(('HAVE_CURL_OPENSSL', 1))
-            if e[2:] == 'gnutls':
-                define_macros.append(('HAVE_CURL_GNUTLS', 1))
-        elif e[:2] == "-L":
+            if e[2:] == 'ssl' and not ssltype:
+                ssltype = 'OpenSSL'
+            if e[2:] == 'gnutls' and not ssltype:
+                ssltype = 'GnuTLS'
+        elif e[:2] == '-L':
             library_dirs.append(e[2:])
         else:
             extra_link_args.append(e)
-    for e in split_quoted(os.popen("'%s' --features" % CURL_CONFIG).read()):
-        if e == 'SSL':
-            define_macros.append(('HAVE_CURL_SSL', 1))
     if not libraries:
-        libraries.append("curl")
+        libraries.append('curl')
     # Add extra compile flag for MacOS X
-    if sys.platform[:-1] == "darwin":
-        extra_link_args.append("-flat_namespace")
+    if sys.platform[:-1] == 'darwin':
+        extra_link_args.append('-flat_namespace')
 
+    # add relevant ssl flags, and check if curl has SSL even if we could not detect the type
+    if ssltype:
+        define_macros.append(('HAVE_CURL_SSL', 1))
+        define_macros.append(('HAVE_CURL_%s' % ssltype.upper(), 1))
+        if ssltype == "OpenSSL":
+            openssl_dir = scan_argv('--openssl-dir=', '')
+            if openssl_dir:
+                include_dirs.append(os.path.join(openssl_dir, 'include'))
+    else:
+        for e in split_quoted(os.popen("'%s' --features" % curl_config).read()):
+            if e == 'SSL':
+                define_macros.append(('HAVE_CURL_SSL', 1))
+                break
 
 ###############################################################################
 
-def get_kw(**kw): return kw
+if sys.platform == 'win32':
+    config_win32()
+else:
+    config_unix()
 
 ext = Extension(
     name=PACKAGE,
-    sources=[
-        os.path.join("src", "pycurl.c"),
-    ],
+    sources=[os.path.join('src', 'pycurl.c')],
     include_dirs=include_dirs,
     define_macros=define_macros,
     library_dirs=library_dirs,
@@ -151,8 +155,6 @@ ext = Extension(
     extra_compile_args=extra_compile_args,
     extra_link_args=extra_link_args,
 )
-##print ext.__dict__; sys.exit(1)
-
 
 ###############################################################################
 
@@ -186,12 +188,10 @@ def get_data_files():
             assert os.path.isfile(f), (f, install_dir)
     return data_files
 
-##print get_data_files(); sys.exit(1)
-
 
 ###############################################################################
 
-setup_args = get_kw(
+setup_args = dict(
     name=PACKAGE,
     version=VERSION,
     description="PycURL -- cURL library module for Python",
@@ -203,23 +203,13 @@ setup_args = get_kw(
     license="LGPL/MIT",
     data_files=get_data_files(),
     ext_modules=[ext],
-    long_description="""
-This module provides Python bindings for the cURL library.""",
-)
-
-if sys.version >= "2.2":
-    setup_args["packages"] = [PY_PACKAGE]
-    setup_args["package_dir"] = { PY_PACKAGE: os.path.join('python', 'curl') }
-
-
-##print distutils.__version__
-if LooseVersion(distutils.__version__) > LooseVersion("1.0.1"):
-    setup_args["platforms"] = "All"
-if LooseVersion(distutils.__version__) < LooseVersion("1.0.3"):
-    setup_args["licence"] = setup_args["license"]
+    long_description="Python bindings for the cURL library.",
+    packages=[PY_PACKAGE],
+    package_dir={PY_PACKAGE: os.path.join('python', 'curl')},
+    platforms="All",
+    )
 
 if __name__ == "__main__":
     for o in ext.extra_objects:
         assert os.path.isfile(o), o
-    # We can live with the deprecationwarning for a while
-    apply(setup, (), setup_args)
+    setup(**setup_args)

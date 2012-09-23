@@ -67,7 +67,7 @@ num_handles = len(m.handles)
 
 while (pycurl.E_CALL_MULTI_PERFORM==m.socket_all()[0]):
     pass
-    
+
 timeout = m.timeout()
 
 

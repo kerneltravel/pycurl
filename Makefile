@@ -1,11 +1,10 @@
 #
 # to use a specific python version call
-#   `make PYTHON=python2.2'
+#   `make PYTHON=python2.7'
 #
 
 SHELL = /bin/sh
 
-PYTHON = python2.3
 PYTHON = python
 
 all build:
@@ -26,10 +25,9 @@ install install_lib:
 	$(PYTHON) setup.py $@
 
 clean:
-	-rm -rf build dist
-	-rm -f *.pyc *.pyo */*.pyc */*.pyo */*/*.pyc */*/*.pyo
-	-rm -f MANIFEST
-	cd src && $(MAKE) clean
+	$(RM) -r build dist
+	$(RM) *.pyc *.pyo */*.pyc */*.pyo */*/*.pyc */*/*.pyo
+	$(RM) MANIFEST src/pycurl.so
 
 distclean: clean
 
@@ -40,18 +38,13 @@ dist sdist: distclean
 
 # target for maintainer
 windist: distclean
+	python2.6 setup.py bdist_wininst
 	rm -rf build
-	python2.2 setup.py bdist_wininst
+	python2.7 setup.py bdist_wininst
 	rm -rf build
-	python2.3 setup.py bdist_wininst
+	python2.6 setup_win32_ssl.py bdist_wininst
 	rm -rf build
-	python2.4 setup.py bdist_wininst
-	rm -rf build
-	python2.2 setup_win32_ssl.py bdist_wininst
-	rm -rf build
-	python2.3 setup_win32_ssl.py bdist_wininst
-	rm -rf build
-	python2.4 setup_win32_ssl.py bdist_wininst
+	python2.7 setup_win32_ssl.py bdist_wininst
 	rm -rf build
 
 
