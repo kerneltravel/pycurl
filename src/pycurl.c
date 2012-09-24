@@ -1,4 +1,4 @@
-/* PycURL -- cURL Python module
+/* pycurl -- libcurl python module
  *
  * Authors:
  *  Copyright (C) 2001-2008 by Kjetil Jacobsen <kjetilja at gmail.com>
@@ -3378,7 +3378,7 @@ static PyMethodDef curl_methods[] = {
 
 /* Module docstring */
 static char module_doc [] =
-"This module implements an interface to the cURL library.\n"
+"This module implements an interface to libcurl.\n"
 "\n"
 "Types:\n"
 "\n"

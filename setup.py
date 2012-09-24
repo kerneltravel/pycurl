@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 # vi:ts=4:et
 
-"""Setup script for the PycURL module distribution."""
+"""Setup script for the pycurl module distribution."""
 
 PACKAGE = "pycurl"
 PY_PACKAGE = "curl"
@@ -58,8 +58,8 @@ def add_libdirs(envvar, sep, fatal=0):
 def config_win32():
     global include_dirs, extra_objects, extra_link_args, extra_compile_args
     # Windows users have to configure the curl_dir path parameter to match
-    # their cURL source installation.  The path set here is just an example
-    # and thus unlikely to match your installation.
+    # their libcurl source installation.  The path set here is just an
+    # example and thus unlikely to match your installation.
     curl_dir = r"c:\src\build\pycurl\curl-7.16.2.1"
     curl_dir = scan_argv("--curl-dir=", curl_dir)
     print "Using curl directory:", curl_dir
@@ -194,7 +194,7 @@ def get_data_files():
 setup_args = dict(
     name=PACKAGE,
     version=VERSION,
-    description="PycURL -- cURL library module for Python",
+    description="pycurl -- libcurl module for Python",
     author="Kjetil Jacobsen, Markus F.X.J. Oberhumer",
     author_email="kjetilja at gmail.com, markus at oberhumer.com",
     maintainer="Oskari Saarenmaa",
@@ -203,7 +203,7 @@ setup_args = dict(
     license="LGPL/MIT",
     data_files=get_data_files(),
     ext_modules=[ext],
-    long_description="Python bindings for the cURL library.",
+    long_description="Python bindings for libcurl.",
     packages=[PY_PACKAGE],
     package_dir={PY_PACKAGE: os.path.join('python', 'curl')},
     platforms="All",

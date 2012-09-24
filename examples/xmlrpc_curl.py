@@ -19,7 +19,7 @@ import xmlrpclib, pycurl
 
 
 class CURLTransport(xmlrpclib.Transport):
-    """Handles a cURL HTTP transaction to an XML-RPC server."""
+    """Handles a HTTP transaction to an XML-RPC server."""
 
     xmlrpc_h = [ "Content-Type: text/xml" ]
 

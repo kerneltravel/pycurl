@@ -23,7 +23,7 @@ class ProgressBar:
     def __init__(self, uri):
         self.round = 0.0
         win = gtk.Window(gtk.WINDOW_TOPLEVEL)
-        win.set_title("PycURL progress")
+        win.set_title("pycurl progress")
         win.show()
         vbox = gtk.VBox(spacing=5)
         vbox.set_border_width(10)

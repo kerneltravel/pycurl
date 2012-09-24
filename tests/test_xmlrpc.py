@@ -9,7 +9,7 @@ import pycurl
 
 # Header fields passed in request
 xmlrpc_header = [
-    "User-Agent: PycURL XML-RPC Test", "Content-Type: text/xml"
+    "User-Agent: pycurl XML-RPC Test", "Content-Type: text/xml"
     ]
 
 # XML-RPC request template
