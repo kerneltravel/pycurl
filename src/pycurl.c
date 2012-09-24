@@ -744,7 +744,6 @@ static int
 util_curl_init(CurlObject *self)
 {
     int res;
-    char *s = NULL;
 
     /* Set curl error buffer and zero it */
     res = curl_easy_setopt(self->handle, CURLOPT_ERRORBUFFER, self->error);
@@ -778,14 +777,10 @@ util_curl_init(CurlObject *self)
     }
 
     /* Set default USERAGENT */
-    s = (char *) malloc(7 + strlen(LIBCURL_VERSION) + 1);
-    if (s == NULL) {
-        return (-1);
-    }
-    strcpy(s, "PycURL/"); strcpy(s+7, LIBCURL_VERSION);
-    res = curl_easy_setopt(self->handle, CURLOPT_USERAGENT, (char *) s);
+    res = curl_easy_setopt(self->handle, CURLOPT_USERAGENT,
+                           "libcurl/" LIBCURL_VERSION
+                           " pycurl/" PYCURL_VERSION);
     if (res != CURLE_OK) {
-        free(s);
         return (-1);
     }
     return (0);
@@ -3520,7 +3515,8 @@ initpycurl(void)
     assert(curlobject_constants != NULL);
 
     /* Add version strings to the module */
-    insstr(d, "version", curl_version());
+    insobj2(d, NULL, "version",
+            PyString_FromFormat("%s pycurl/" PYCURL_VERSION, curl_version()));
     insstr(d, "COMPILE_DATE", __DATE__ " " __TIME__);
     insint(d, "COMPILE_PY_VERSION_HEX", PY_VERSION_HEX);
     insint(d, "COMPILE_LIBCURL_VERSION_NUM", LIBCURL_VERSION_NUM);
