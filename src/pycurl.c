@@ -70,22 +70,22 @@ typedef int Py_ssize_t;
 #define UNUSED(var)     ((void)&var)
 
 /* Cruft for thread safe SSL crypto locks, snapped from the PHP curl extension */
-#if defined(HAVE_CURL_SSL)
-# if defined(HAVE_CURL_OPENSSL)
-#   define PYCURL_NEED_SSL_TSL
-#   define PYCURL_NEED_OPENSSL_TSL
-#   include <openssl/crypto.h>
-# elif defined(HAVE_CURL_GNUTLS)
-#   define PYCURL_NEED_SSL_TSL
-#   define PYCURL_NEED_GNUTLS_TSL
-#   include <gcrypt.h>
-# else
-#  warning \
-   "libcurl was compiled with SSL support, but configure could not determine which " \
-   "library was used; thus no SSL crypto locking callbacks will be set, which may " \
-   "cause random crashes on SSL requests"
-# endif /* HAVE_CURL_OPENSSL || HAVE_CURL_GNUTLS */
-#endif /* HAVE_CURL_SSL */
+#if defined(HAVE_CURL_OPENSSL)
+#    define PYCURL_NEED_SSL_TSL
+#    define PYCURL_NEED_OPENSSL_TSL
+#    include <openssl/crypto.h>
+#elif defined(HAVE_CURL_GNUTLS)
+#    define PYCURL_NEED_SSL_TSL
+#    define PYCURL_NEED_GNUTLS_TSL
+#    include <gcrypt.h>
+#elif defined(HAVE_CURL_NSS)
+/* NO-OP, NSS is thread safe */
+#elif defined(HAVE_CURL_SSL)
+#warning \
+    "libcurl was compiled with SSL support, but configure could not determine which " \
+    "library was used; thus no SSL crypto locking callbacks will be set, which may " \
+    "cause random crashes on SSL requests"
+#endif /* SSL */
 
 #if defined(PYCURL_NEED_SSL_TSL)
 static void pycurl_ssl_init(void);

@@ -12,6 +12,10 @@ import glob, os, sys, subprocess
 from distutils.core import setup
 from distutils.extension import Extension
 from distutils.util import split_quoted
+try:
+    import ctypes
+except ImportError:
+    ctypes = None
 
 include_dirs = []
 define_macros = []
@@ -77,6 +81,19 @@ def config_win32():
 def config_unix():
     global include_dirs, library_dirs, extra_compile_args, extra_link_args, define_macros, libraries
 
+    # check ssl library for locking
+    ssltype = None
+    if ctypes:
+        curl_version = ctypes.cdll.LoadLibrary('libcurl.so').curl_version
+        curl_version.restype = ctypes.c_char_p
+        curl_verstr = curl_version()
+        if ' NSS/' in curl_verstr:
+            ssltype = 'NSS'
+        elif ' GnuTLS/' in curl_verstr:
+            ssltype = 'GnuTLS'
+        elif ' OpenSSL/' in curl_verstr:
+            ssltype = 'OpenSSL'
+
     # get relevant compile and link flags
     curl_config = scan_argv('--curl-config=', 'curl-config')
     d = os.popen("'%s' --version" % curl_config).read().strip()
@@ -104,7 +121,6 @@ def config_unix():
     if not optbuf:
         raise Exception('Neither of curl-config --libs or --static-libs'
                         'produced output')
-    ssltype = None
     for e in split_quoted(optbuf):
         if e[:2] == '-l':
             libraries.append(e[2:])
