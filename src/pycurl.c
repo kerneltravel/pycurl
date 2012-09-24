@@ -2992,20 +2992,37 @@ do_multi_select(CurlMultiObject *self, PyObject *args)
 
 /* --------------- methods --------------- */
 
-static char cso_setopt_doc [] = "setopt(option, parameter) -> None.  Set curl share option.  Throws pycurl.error exception upon failure.\n";
-static char co_close_doc [] = "close() -> None.  Close handle and end curl session.\n";
-static char co_errstr_doc [] = "errstr() -> String.  Return the internal libcurl error buffer string.\n";
-static char co_getinfo_doc [] = "getinfo(info) -> Res.  Extract and return information from a curl session.  Throws pycurl.error exception upon failure.\n";
-static char co_perform_doc [] = "perform() -> None.  Perform a file transfer.  Throws pycurl.error exception upon failure.\n";
-static char co_setopt_doc [] = "setopt(option, parameter) -> None.  Set curl session option.  Throws pycurl.error exception upon failure.\n";
-static char co_unsetopt_doc [] = "unsetopt(option) -> None.  Reset curl session option to default value.  Throws pycurl.error exception upon failure.\n";
-static char co_reset_doc [] = "reset() -> None. Reset all options set on curl handle to default values, but preserves live connections, session ID cache, DNS cache, cookies, and shares.\n";
-
-static char co_multi_fdset_doc [] = "fdset() -> Tuple.  Returns a tuple of three lists that can be passed to the select.select() method .\n";
-static char co_multi_info_read_doc [] = "info_read([max_objects]) -> Tuple. Returns a tuple (number of queued handles, [curl objects]).\n";
-static char co_multi_select_doc [] = "select([timeout]) -> Int.  Returns result from doing a select() on the curl multi file descriptor with the given timeout.\n";
-static char co_multi_socket_action_doc [] = "socket_action(sockfd, ev_bitmask) -> Tuple.  Returns result from doing a socket_action() on the curl multi file descriptor with the given timeout.\n";
-static char co_multi_socket_all_doc [] = "socket_all() -> Tuple.  Returns result from doing a socket_all() on the curl multi file descriptor with the given timeout.\n";
+static const char cso_setopt_doc[] = "setopt(option, parameter) -> None.  "
+    "Set curl share option.  "
+    "Throws pycurl.error exception upon failure.\n";
+static const char co_close_doc[] = "close() -> None.  "
+    "Close handle and end curl session.\n";
+static const char co_errstr_doc[] = "errstr() -> String.  "
+    "Return the internal libcurl error buffer string.\n";
+static const char co_getinfo_doc[] = "getinfo(info) -> Res.  "
+    "Extract and return information from a curl session.  "
+    "Throws pycurl.error exception upon failure.\n";
+static const char co_perform_doc[] = "perform() -> None.  "
+    "Perform a file transfer.  "
+    "Throws pycurl.error exception upon failure.\n";
+static const char co_setopt_doc[] = "setopt(option, parameter) -> None.  "
+    "Set curl session option.  "
+    "Throws pycurl.error exception upon failure.\n";
+static const char co_unsetopt_doc[] = "unsetopt(option) -> None.  "
+    "Reset curl session option to default value.  "
+    "Throws pycurl.error exception upon failure.\n";
+static const char co_reset_doc[] = "reset() -> None.  "
+    "Reset all options set on curl handle to default values, but preserves live connections, session ID cache, DNS cache, cookies, and shares.\n";
+static const char co_multi_fdset_doc[] = "fdset() -> Tuple.  "
+    "Returns a tuple of three lists that can be passed to the select.select() method .\n";
+static const char co_multi_info_read_doc[] = "info_read([max_objects]) -> Tuple.  "
+    "Returns a tuple (number of queued handles, [curl objects]).\n";
+static const char co_multi_select_doc[] = "select([timeout]) -> Int.  "
+    "Returns result from doing a select() on the curl multi file descriptor with the given timeout.\n";
+static const char co_multi_socket_action_doc[] = "socket_action(sockfd, ev_bitmask) -> Tuple.  "
+    "Returns result from doing a socket_action() on the curl multi file descriptor with the given timeout.\n";
+static const char co_multi_socket_all_doc[] = "socket_all() -> Tuple.  "
+    "Returns result from doing a socket_all() on the curl multi file descriptor with the given timeout.\n";
 
 static PyMethodDef curlshareobject_methods[] = {
     {"setopt", (PyCFunction)do_curlshare_setopt, METH_VARARGS, cso_setopt_doc},
@@ -3344,23 +3361,23 @@ error:
 
 
 /* Per function docstrings */
-static char pycurl_global_init_doc [] =
-"global_init(option) -> None.  Initialize curl environment.\n";
+static const char pycurl_global_init_doc[] =
+    "global_init(option) -> None.  Initialize curl environment.\n";
 
-static char pycurl_global_cleanup_doc [] =
-"global_cleanup() -> None.  Cleanup curl environment.\n";
+static const char pycurl_global_cleanup_doc[] =
+    "global_cleanup() -> None.  Cleanup curl environment.\n";
 
-static char pycurl_version_info_doc [] =
-"version_info() -> tuple.  Returns a 12-tuple with the version info.\n";
+static const char pycurl_version_info_doc[] =
+    "version_info() -> tuple.  Returns a 12-tuple with the version info.\n";
 
-static char pycurl_share_new_doc [] =
-"CurlShare() -> New CurlShare object.";
+static const char pycurl_share_new_doc[] =
+    "CurlShare() -> New CurlShare object.";
 
-static char pycurl_curl_new_doc [] =
-"Curl() -> New curl object.  Implicitly calls global_init() if not called.\n";
+static const char pycurl_curl_new_doc[] =
+    "Curl() -> New curl object.  Implicitly calls global_init() if not called.\n";
 
-static char pycurl_multi_new_doc [] =
-"CurlMulti() -> New curl multi-object.\n";
+static const char pycurl_multi_new_doc[] =
+    "CurlMulti() -> New curl multi-object.\n";
 
 
 /* List of functions defined in this module */
@@ -3376,7 +3393,7 @@ static PyMethodDef curl_methods[] = {
 
 
 /* Module docstring */
-static char module_doc [] =
+static const char module_doc[] =
 "This module implements an interface to libcurl.\n"
 "\n"
 "Types:\n"
